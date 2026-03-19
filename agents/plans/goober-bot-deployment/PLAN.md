@@ -77,44 +77,44 @@ The RAM savings of bare binary don't justify losing Docker's operational benefit
 ## Infrastructure Components
 
 ### Phase 1 — Minimum Viable Deployment (MVP)
-Status: **Not Started**
+Status: **Terraform Complete — Awaiting AWS Auth + Deploy**
 
 Build the bare minimum to get goober-bot running on AWS with Spot EC2.
 
 #### 1.1 Terraform Foundation
-- [ ] Terraform backend configuration (S3 + DynamoDB for state locking)
-- [ ] AWS provider configuration with version constraints
-- [ ] Variables and locals for project-wide settings
-- [ ] `.gitignore` for Terraform artifacts (`.terraform/`, `*.tfstate*`, `*.tfvars`)
+- [x] Terraform backend configuration (S3 + DynamoDB for state locking) — `envs/prod/backend.tf`
+- [x] AWS provider configuration with version constraints — `envs/prod/providers.tf`
+- [x] Variables and locals for project-wide settings — `envs/prod/variables.tf`
+- [x] `.gitignore` for Terraform artifacts (`.terraform/`, `*.tfstate*`, `*.tfvars`)
 
 #### 1.2 Networking (VPC)
-- [ ] VPC with a single public subnet (one AZ — non-HA bot doesn't need multi-AZ)
-- [ ] Internet Gateway
-- [ ] Route table associating public subnet to IGW
-- [ ] Security group: **all outbound allowed, all inbound denied**
+- [x] VPC with a single public subnet (one AZ — non-HA bot doesn't need multi-AZ) — `modules/vpc/`
+- [x] Internet Gateway
+- [x] Route table associating public subnet to IGW
+- [x] Security group: **all outbound allowed, all inbound denied**
   - The bot initiates all connections (Telegram long-poll, NOAA API)
   - No SSH access by default (use SSM Session Manager if debugging is needed)
 
 #### 1.3 Container Registry (ECR)
-- [ ] ECR repository for `goober-bot` images
-- [ ] Lifecycle policy: keep only the last 5 images (cost saving)
+- [x] ECR repository for `goober-bot` images — `modules/ecr/`
+- [x] Lifecycle policy: keep only the last 5 images (cost saving)
 
 #### 1.4 Secrets Management
-- [ ] SSM Parameter Store `SecureString` for `TELEGRAM_BOT_TOKEN`
-- [ ] SSM Parameter Store `String` for `ALLOWED_USER_IDS`
-- [ ] Note: SSM parameters are created manually (one-time); Terraform references them by name, doesn't manage the values
+- [ ] SSM Parameter Store `SecureString` for `TELEGRAM_BOT_TOKEN` — **manual, requires AWS auth**
+- [ ] SSM Parameter Store `String` for `ALLOWED_USER_IDS` — **manual, requires AWS auth**
+- [x] Note: SSM parameters are created manually (one-time); Terraform references them by name, doesn't manage the values
 
 #### 1.5 Persistent Data Volume (EBS)
-- [ ] Dedicated 1 GiB gp3 EBS volume for `/data` (SQLite database)
-- [ ] Volume exists independently of the EC2 instance lifecycle
-- [ ] Tagged for identification by user data script
-- [ ] User data script attaches, formats (if new), and mounts the volume on boot
+- [x] Dedicated 1 GiB gp3 EBS volume for `/data` (SQLite database) — `modules/compute/main.tf`
+- [x] Volume exists independently of the EC2 instance lifecycle
+- [x] Tagged for identification by user data script
+- [x] User data script attaches, formats (if new), and mounts the volume on boot
 
 > **Why a separate EBS volume instead of using the root volume?**
 > The root volume is destroyed when the ASG replaces an instance. A dedicated data volume persists independently, surviving Spot interruptions and instance replacements. The user data script finds it by tag and reattaches it.
 
 #### 1.6 Compute (EC2 Spot via ASG)
-- [ ] **Launch Template:**
+- [x] **Launch Template:** — `modules/compute/main.tf`
   - AMI: Amazon Linux 2023 ARM64 (latest, looked up via SSM parameter)
   - Instance type: `t4g.nano`
   - Spot market options: `spot` with `capacity-optimized` allocation strategy
@@ -125,7 +125,7 @@ Build the bare minimum to get goober-bot running on AWS with Spot EC2.
   - Network: public subnet, auto-assign public IP
   - User data script (see below)
   - Metadata options: IMDSv2 required (security best practice)
-- [ ] **Auto Scaling Group:**
+- [x] **Auto Scaling Group:** — `modules/compute/main.tf`
   - Min / max / desired capacity: 1 / 1 / 1
   - Single AZ (must match the EBS data volume's AZ)
   - Mixed instances policy with Spot allocation:
@@ -135,12 +135,12 @@ Build the bare minimum to get goober-bot running on AWS with Spot EC2.
   - Capacity rebalance: enabled (proactively replaces at-risk Spot instances)
   - Cooldown / grace period: 300s (allow time for Docker pull + bot startup)
   - Instance refresh: rolling update for launch template changes
-- [ ] **IAM Instance Profile / Role:**
+- [x] **IAM Instance Profile / Role:** — `modules/compute/main.tf`
   - `ecr:GetAuthorizationToken`, `ecr:BatchGetImage`, `ecr:GetDownloadUrlForLayer` — pull images from ECR
   - `ssm:GetParameter` (with `kms:Decrypt`) — read bot token and allowed user IDs
   - `ec2:AttachVolume`, `ec2:DescribeVolumes` — attach the persistent data volume
-  - `logs:CreateLogGroup`, `logs:CreateLogStream`, `logs:PutLogEvents` — write to CloudWatch Logs (via CloudWatch agent or Docker log driver)
-  - `ssm:*` for SSM Session Manager access (optional, for debugging)
+  - `logs:CreateLogGroup`, `logs:CreateLogStream`, `logs:PutLogEvents` — write to CloudWatch Logs (via Docker awslogs driver)
+  - `sts:GetCallerIdentity` — needed by user data script
 
 #### 1.7 User Data Script (cloud-init)
 
@@ -218,10 +218,10 @@ docker run -d \
 ```
 
 #### 1.8 Monitoring & Alerts
-- [ ] CloudWatch log group `/goober-bot/application` with 7-day retention
-- [ ] CloudWatch alarm: ASG `GroupInServiceInstances` < 1 for 5 minutes (detect prolonged outages)
-- [ ] SNS topic for alarm notifications (email)
-- [ ] Monthly budget alert ($5 threshold)
+- [x] CloudWatch log group `/goober-bot/application` with 7-day retention — `modules/monitoring/main.tf`
+- [x] CloudWatch alarm: ASG `GroupInServiceInstances` < 1 for 5 minutes (detect prolonged outages) — `modules/monitoring/main.tf`
+- [x] SNS topic for alarm notifications (email) — `modules/monitoring/main.tf`
+- [x] Monthly budget alert ($5 threshold, 80% + 100% notifications) — `modules/monitoring/main.tf`
 
 ---
 
@@ -437,11 +437,13 @@ When AWS reclaims a Spot instance:
 
 Phase 1 should be implemented in this order (each step depends on the previous):
 
-1. `.gitignore` + Terraform foundation (`backend.tf`, `providers.tf`, variables)
-2. VPC module (VPC, subnet, IGW, route table, security groups)
-3. ECR module (repository + lifecycle policy)
-4. Compute module (launch template, ASG, IAM role, EBS data volume, user data script)
-5. Monitoring module (CloudWatch log group, ASG alarm, SNS topic, budget)
-6. Environment composition (`envs/prod/main.tf` wiring modules together)
-7. Build and push ARM64 Docker image to ECR
-8. `terraform apply` + manual verification
+1. ~~`.gitignore` + Terraform foundation (`backend.tf`, `providers.tf`, variables)~~ **DONE**
+2. ~~VPC module (VPC, subnet, IGW, route table, security groups)~~ **DONE**
+3. ~~ECR module (repository + lifecycle policy)~~ **DONE**
+4. ~~Compute module (launch template, ASG, IAM role, EBS data volume, user data script)~~ **DONE**
+5. ~~Monitoring module (CloudWatch log group, ASG alarm, SNS topic, budget)~~ **DONE**
+6. ~~Environment composition (`envs/prod/main.tf` wiring modules together)~~ **DONE**
+7. Create Terraform state backend (S3 bucket + DynamoDB table) — **requires AWS auth**
+8. Store SSM parameters (bot token, allowed user IDs) — **requires AWS auth**
+9. Build and push ARM64 Docker image to ECR — **requires AWS auth**
+10. `terraform init` + `terraform apply` + manual verification — **requires AWS auth**
