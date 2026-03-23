@@ -30,8 +30,8 @@ graph TB
         logs["CloudWatch Logs\n/goober-bot/application"]
         alarm["CloudWatch Alarm\nGroupInServiceInstances < 1"]
         sns[SNS Topic]
-        budget["Budget Alert ($5/mo)"]
-        email([cam.loren56@gmail.com])
+        budget["Budget Alert - 5 USD/mo"]
+        email([Email Alerts])
     end
 
     user <-->|messages| tg
