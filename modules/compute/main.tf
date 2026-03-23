@@ -183,15 +183,6 @@ resource "aws_launch_template" "bot" {
   image_id      = data.aws_ssm_parameter.al2023_arm64.value
   instance_type = var.instance_type
 
-  # Spot configuration
-  instance_market_options {
-    market_type = "spot"
-    spot_options {
-      max_price          = null # Use current Spot price (no cap)
-      spot_instance_type = "one-time"
-    }
-  }
-
   # Use standard credit mode to avoid surprise charges on Spot
   credit_specification {
     cpu_credits = "standard"

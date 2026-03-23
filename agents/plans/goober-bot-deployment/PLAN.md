@@ -77,7 +77,7 @@ The RAM savings of bare binary don't justify losing Docker's operational benefit
 ## Infrastructure Components
 
 ### Phase 1 — Minimum Viable Deployment (MVP)
-Status: **Terraform Complete — Awaiting AWS Auth + Deploy**
+Status: **Complete**
 
 Build the bare minimum to get goober-bot running on AWS with Spot EC2.
 
@@ -443,7 +443,7 @@ Phase 1 should be implemented in this order (each step depends on the previous):
 4. ~~Compute module (launch template, ASG, IAM role, EBS data volume, user data script)~~ **DONE**
 5. ~~Monitoring module (CloudWatch log group, ASG alarm, SNS topic, budget)~~ **DONE**
 6. ~~Environment composition (`envs/prod/main.tf` wiring modules together)~~ **DONE**
-7. Create Terraform state backend (S3 bucket + DynamoDB table) — **requires AWS auth**
-8. Store SSM parameters (bot token, allowed user IDs) — **requires AWS auth**
-9. Build and push ARM64 Docker image to ECR — **requires AWS auth**
-10. `terraform init` + `terraform apply` + manual verification — **requires AWS auth**
+7. ~~Create Terraform state backend (S3 bucket + DynamoDB table)~~ **DONE**
+8. ~~Store SSM parameters (bot token, allowed user IDs)~~ **DONE**
+9. ~~Build and push ARM64 Docker image to ECR~~ **DONE**
+10. ~~`terraform init` + `terraform apply` + manual verification~~ **DONE**

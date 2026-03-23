@@ -18,7 +18,7 @@ LOG_GROUP="${log_group_name}"
 
 # --- System Setup ---
 dnf update -y -q
-dnf install -y -q docker aws-cli-2
+dnf install -y -q docker
 
 # --- Swap (safety net for 512 MB instance) ---
 dd if=/dev/zero of=/swapfile bs=1M count=$SWAP_SIZE_MB
