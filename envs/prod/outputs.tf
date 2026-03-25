@@ -17,6 +17,13 @@ output "ecr_repository_url" {
   value       = module.ecr.repository_url
 }
 
+# --- CI/CD ---
+
+output "github_actions_role_arn" {
+  description = "IAM role ARN for GitHub Actions to assume (set as AWS_GITHUB_ACTIONS_ROLE_ARN secret)"
+  value       = module.github_actions_iam.role_arn
+}
+
 # --- Compute ---
 
 output "asg_name" {

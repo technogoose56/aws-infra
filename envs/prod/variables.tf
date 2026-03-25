@@ -74,7 +74,13 @@ variable "asg_health_check_grace_period" {
   default     = 300
 }
 
-# --- ECR ---
+# --- ECR / CI/CD ---
+
+variable "github_actions_repo" {
+  description = "GitHub repository in org/repo format granted ECR push access via OIDC"
+  type        = string
+  default     = "technogoose56/goober-bot"
+}
 
 variable "ecr_max_image_count" {
   description = "Maximum number of untagged images to retain in ECR"

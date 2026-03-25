@@ -25,6 +25,16 @@ module "ecr" {
   max_image_count = var.ecr_max_image_count
 }
 
+# --- CI/CD (GitHub Actions OIDC) ---
+
+module "github_actions_iam" {
+  source = "../../modules/github-actions-iam"
+
+  project_name = var.project_name
+  github_repo  = var.github_actions_repo
+  ecr_repo_arn = module.ecr.repository_arn
+}
+
 # --- Compute (EC2 Spot via ASG) ---
 
 module "compute" {
