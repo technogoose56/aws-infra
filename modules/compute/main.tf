@@ -297,6 +297,16 @@ resource "aws_autoscaling_group" "bot" {
     }
   }
 
+  # Enable CloudWatch group metrics (required — not published by default)
+  enabled_metrics = [
+    "GroupInServiceInstances",
+    "GroupDesiredCapacity",
+    "GroupMinSize",
+    "GroupMaxSize",
+    "GroupTotalInstances",
+  ]
+  metrics_granularity = "1Minute"
+
   # Allow ASG to replace instances cleanly
   instance_refresh {
     strategy = "Rolling"
