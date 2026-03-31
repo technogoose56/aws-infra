@@ -34,7 +34,7 @@ resource "aws_cloudwatch_metric_alarm" "no_instances" {
   evaluation_periods  = 2
   metric_name         = "GroupInServiceInstances"
   namespace           = "AWS/AutoScaling"
-  period              = 300
+  period              = 1800
   statistic           = "Minimum"
   threshold           = 1
   treat_missing_data  = "breaching"
