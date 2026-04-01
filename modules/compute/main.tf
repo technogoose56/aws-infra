@@ -220,7 +220,7 @@ resource "aws_launch_template" "bot" {
 
   # User data script (templated)
   user_data = base64encode(templatefile(
-    "${path.module}/user_data.sh.tpl",
+    var.user_data_template_path,
     {
       region                    = var.aws_region
       project_name              = var.project_name

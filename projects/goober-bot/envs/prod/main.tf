@@ -68,6 +68,9 @@ module "compute" {
 
   # Logging
   log_group_name = local.log_group_name
+
+  # User data
+  user_data_template_path = "${path.module}/user_data.sh.tpl"
 }
 
 # --- Monitoring & Alerts ---

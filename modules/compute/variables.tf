@@ -104,3 +104,10 @@ variable "log_group_name" {
   description = "CloudWatch log group name"
   type        = string
 }
+
+# --- User Data ---
+
+variable "user_data_template_path" {
+  description = "Absolute path to the user data shell template file"
+  type        = string
+}
