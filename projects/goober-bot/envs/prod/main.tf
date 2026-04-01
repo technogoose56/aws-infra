@@ -9,7 +9,7 @@ locals {
 # --- Networking ---
 
 module "vpc" {
-  source = "../../../modules/vpc"
+  source = "../../../../modules/vpc"
 
   project_name       = var.project_name
   vpc_cidr           = var.vpc_cidr
@@ -19,7 +19,7 @@ module "vpc" {
 # --- Container Registry ---
 
 module "ecr" {
-  source = "../../../modules/ecr"
+  source = "../../../../modules/ecr"
 
   repository_name = var.project_name
   max_image_count = var.ecr_max_image_count
@@ -28,7 +28,7 @@ module "ecr" {
 # --- CI/CD (GitHub Actions OIDC) ---
 
 module "github_actions_iam" {
-  source = "../../../modules/github-actions-iam"
+  source = "../../../../modules/github-actions-iam"
 
   project_name = var.project_name
   github_repo  = var.github_actions_repo
@@ -38,7 +38,7 @@ module "github_actions_iam" {
 # --- Compute (EC2 Spot via ASG) ---
 
 module "compute" {
-  source = "../../../modules/compute"
+  source = "../../../../modules/compute"
 
   project_name = var.project_name
   environment  = var.environment
@@ -73,7 +73,7 @@ module "compute" {
 # --- Monitoring & Alerts ---
 
 module "monitoring" {
-  source = "../../../modules/monitoring"
+  source = "../../../../modules/monitoring"
 
   project_name       = var.project_name
   log_group_name     = local.log_group_name

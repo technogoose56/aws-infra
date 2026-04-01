@@ -2,7 +2,6 @@
 .terraform/
 *.tfstate
 *.tfstate.*
-*.tfvars.json
 crash.log
 crash.*.log
 override.tf
@@ -29,3 +28,6 @@ Thumbs.db
 
 # Temp files
 tmp/
+
+# Claude
+.claude/

@@ -15,7 +15,7 @@ data "aws_iam_openid_connect_provider" "github" {
 }
 
 module "terraform_cicd_iam" {
-  source = "../../../modules/terraform-cicd-iam"
+  source = "../../../../modules/terraform-cicd-iam"
 
   github_repo         = var.github_actions_tf_repo
   oidc_provider_arn   = data.aws_iam_openid_connect_provider.github.arn
