@@ -62,7 +62,7 @@ resource "aws_iam_role_policy" "tf_state" {
           "s3:PutObject",
           "s3:DeleteObject",
         ]
-        Resource = "arn:aws:s3:::${var.tf_state_bucket}/${var.tf_state_key_prefix}*"
+        Resource = "arn:aws:s3:::${var.tf_state_bucket}/*"
       },
       {
         Sid      = "StateBucketList"

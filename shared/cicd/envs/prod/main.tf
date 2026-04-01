@@ -19,7 +19,6 @@ module "terraform_cicd_iam" {
 
   github_repo         = var.github_actions_tf_repo
   oidc_provider_arn   = data.aws_iam_openid_connect_provider.github.arn
-  tf_state_bucket     = var.tf_state_bucket
-  tf_state_key_prefix = var.tf_state_key_prefix
-  tf_lock_table       = var.tf_lock_table
+  tf_state_bucket = var.tf_state_bucket
+  tf_lock_table   = var.tf_lock_table
 }

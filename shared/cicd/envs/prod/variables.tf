@@ -15,13 +15,7 @@ variable "github_actions_tf_repo" {
 variable "tf_state_bucket" {
   description = "S3 bucket name holding Terraform state (used to scope CI/CD IAM permissions)"
   type        = string
-  default     = "goober-bot-terraform-state"
-}
-
-variable "tf_state_key_prefix" {
-  description = "S3 key prefix for Terraform state files"
-  type        = string
-  default     = "prod/"
+  default     = "terraform-state-533267126082-us-east-1-an"
 }
 
 variable "tf_lock_table" {

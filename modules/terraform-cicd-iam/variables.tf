@@ -13,11 +13,6 @@ variable "tf_state_bucket" {
   type        = string
 }
 
-variable "tf_state_key_prefix" {
-  description = "S3 key prefix for Terraform state files (e.g. prod/)"
-  type        = string
-}
-
 variable "tf_lock_table" {
   description = "DynamoDB table name used for Terraform state locking"
   type        = string
